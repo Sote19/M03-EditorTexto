@@ -6,6 +6,8 @@ import formatos
 #Para guardar PDF
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from tkinter import ttk
+
 #Estructura basica para usar Tkinter
 root=Tk()
 root.title("Editor de texto ~ Soteras ~")
@@ -127,6 +129,23 @@ def usar_neku(event=None):
         texto.tag_remove("neku", "sel.first", "sel.last")
     else:
         formatos.neku(texto)
+#TEMAS
+temas={"Claro":{
+            "background":"white",
+            "foreground":"black",
+            "font": ("Arial", 12)},
+        "Oscuro":{
+            "background":"black",
+            "foreground":"white",
+            "font":("Arial", 12)
+        }
+    }
+
+def cambiar_tema(tema):
+    estilo = ttk.Style()
+    estilo.configure("TLabel", background=temas[tema]["background"], foreground=temas[tema]["foreground"])
+    texto.config(background=temas[tema]["background"], fg=temas[tema]["foreground"], font=temas[tema]["font"])
+
                     
 #Menu superior sencillo
 princip_menu=Menu(root)
@@ -151,11 +170,16 @@ menuformatos.add_command(label="Negrita Kursiva -----Cntrl+P", command=usar_neku
 #PDF
 formato_pdf=Menu(princip_menu, tearoff=0)
 princip_menu.add_command(label="Guardar PDF", command=PDF)
+#Menu Temas
+menu_temas=ttk.Combobox(root, values=list(temas.keys()), state="readonly")
+menu_temas.current(0)
+menu_temas.bind("<<ComboboxSelected>>", lambda event: cambiar_tema(menu_temas.get()))
 
 #Bindeos de teclas
 root.bind("<Control-b>", usar_negrita)
 root.bind("<Control-l>", usar_kursiva)
 root.bind("<Control-u>", usar_subrayado)
+root.bind("<Control-p>", usar_neku)
 
 #Hoja en la que escribiremos
 texto = Text(root)
@@ -167,7 +191,8 @@ mensaje = StringVar()
 mensaje.set("Empieza a editar tu texto ;)")
 monitor = Label(root, textvar=mensaje, justify='left')
 monitor.pack(side="left")
-        
+menu_temas.pack()
+cambiar_tema(menu_temas.get()) 
 #Bucle del menu
 root.config(menu=princip_menu)
 root.mainloop()
